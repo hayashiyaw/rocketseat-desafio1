@@ -1,5 +1,7 @@
 import { useState } from 'react'
+
 import '../styles/tasklist.scss'
+
 import { FiTrash, FiCheckSquare } from 'react-icons/fi'
 
 interface Task {
@@ -10,27 +12,42 @@ interface Task {
 
 export function TaskList() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [newTaskTitle, setNewTaskTitle] = useState('');  
+  const [newTaskTitle, setNewTaskTitle] = useState('');
 
-  function handleCreateNewTask() {
+  function handleCreateNewTask() {    
     // Crie uma nova task com um id random, não permita criar caso o título seja vazio.
-    let randomID = (Math.random() * 900).toFixed(0);
 
-    const newTask : Task ={
-      id: parseInt(randomID),
-      title: newTaskTitle,
-      isComplete: false
+    if (!newTaskTitle || newTaskTitle === '' ){
+      console.log('error')
     }
-
-    setTasks([...tasks, newTask])
+    else{
+      let randomID = (Math.random() * 900).toFixed(0);
+      const newTask : Task ={
+        id: parseInt(randomID),
+        title: newTaskTitle,
+        isComplete: false
+      }
+  
+      setTasks([...tasks, newTask])  
+      setNewTaskTitle('')
+    }
   }
 
   function handleToggleTaskCompletion(id: number) {
     // Altere entre `true` ou `false` o campo `isComplete` de uma task com dado ID
+    const newTasks = tasks.map(task => task.id === id ? {
+                                ...task,
+                                isComplete : !task.isComplete
+                              } : task );
+                                
+    setTasks(newTasks);
   }
 
   function handleRemoveTask(id: number) {
     // Remova uma task da listagem pelo ID
+    const filteredTasks = tasks.filter(task => task.id !== id); 
+
+    setTasks(filteredTasks);
   }
 
   return (
@@ -60,7 +77,6 @@ export function TaskList() {
                   <input 
                     type="checkbox"
                     readOnly
-                    value={newTaskTitle}
                     checked={task.isComplete}
                     onClick={() => handleToggleTaskCompletion(task.id)}
                   />
